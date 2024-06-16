@@ -1,0 +1,81 @@
+<mat-card>
+    <mat-card-content>
+
+        <form [formGroup]="bookForm" (ngSubmit)="onSubmit()">
+            <div>
+                <mat-form-field appearance="fill">
+                    <mat-label>Book Name</mat-label>
+                    <input matInput formControlName="name" placeholder="Enter book name">
+                    <mat-error *ngIf="bookForm.get('name')?.hasError('required')">Book name is required</mat-error>
+                </mat-form-field>
+            </div>
+
+            <div>
+                <mat-form-field appearance="fill">
+                    <mat-label>ISBN</mat-label>
+                    <input matInput formControlName="isbn" placeholder="Enter ISBN">
+                    <mat-error *ngIf="bookForm.get('isbn')?.hasError('required')">ISBN is required</mat-error>
+                </mat-form-field>
+            </div>
+            <div>
+                <mat-form-field appearance="fill">
+                    <mat-label>Author</mat-label>
+                    <mat-select formControlName="authorId" placeholder="Select author">
+                        <mat-option *ngFor="let author of authors" [value]="author.id">
+                            {{ author.name }}
+                        </mat-option>
+                    </mat-select>
+                    <!-- <mat-error *ngIf="bookForm.get('authorId')?.hasError('required')">Author is required</mat-error> -->
+                </mat-form-field>
+
+            </div>
+            <div>
+                <button mat-raised-button color="primary" type="submit">{{ isEditMode ? 'Update' : 'Create' }}</button>
+
+            </div>
+        </form>
+
+    </mat-card-content>
+</mat-card>
+
+<!-- src/app/book-table/book-table.component.html -->
+
+<mat-card>
+    <mat-card-content>
+        <div class="mat-elevation-z8">
+            <div class="table-header">
+                <input matInput (keyup)="applyFilter($event)" placeholder="Filter">
+            </div>
+            <table mat-table [dataSource]="dataSource" matSort class="full-width-table">
+        
+                <!-- ID Column -->
+                <ng-container matColumnDef="id">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
+                    <td mat-cell *matCellDef="let element">{{element.id}}</td>
+                </ng-container>
+        
+                <!-- Name Column -->
+                <ng-container matColumnDef="name">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+                    <td mat-cell *matCellDef="let element">{{element.name}}</td>
+                </ng-container>
+        
+                <!-- ISBN Column -->
+                <ng-container matColumnDef="isbn">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>ISBN</th>
+                    <td mat-cell *matCellDef="let element">{{element.isbn}}</td>
+                </ng-container>
+        
+                <!-- Author Column -->
+                <ng-container matColumnDef="author">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Author</th>
+                    <td mat-cell *matCellDef="let element">{{element.author}}</td>
+                </ng-container>
+        
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+            <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+        </div>
+    </mat-card-content>
+</mat-card>
