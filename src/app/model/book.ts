@@ -4,5 +4,5 @@ export interface Book {
     id :number;
     name:string;
     isbn:string;
-    author:Author;
+    author:Author|undefined;
 }

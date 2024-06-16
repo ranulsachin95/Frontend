@@ -1,6 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Author } from '../../model/author';
+import { AuthorService } from '../../service/author.service';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 
 @Component({
   selector: 'app-author',
@@ -9,28 +14,69 @@ import { Router } from '@angular/router';
 })
 export class AuthorComponent {
 
-  bookForm: FormGroup;
-  authors = [
-    { id: 1, name: 'Author 1' },
-    { id: 2, name: 'Author 2' },
-    { id: 3, name: 'Author 3' }
-  ];
+  authorForm: FormGroup;
+  authorId: number | null = null;
+  isEditMode = false;
+  totalElements: number = 0;
+  pageSize: number = 5;
+  currentPage: number = 0;
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort ;
+  
+    displayedColumns: string[] = ['id', 'firstName', 'lastName'];
+    dataSource = new MatTableDataSource<Author>();
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  constructor(private fb: FormBuilder,
+     private router: Router,
+     private authorService: AuthorService,
+    ) {
 
-    this.bookForm = this.fb.group({
-      name: ['', Validators.required],
-      isbn: ['', Validators.required],
-      authorId: ['', Validators.required] 
+    this.authorForm = this.fb.group({
+      lastName: ['', Validators.required],
+      firstName: ['', Validators.required],
     });
   }
 
   ngOnInit(): void {
-   
+    this.loadAuthors();
+  }
+  loadAuthors() {
+    this.authorService.getAllAuthors().subscribe(data => {
+      
+      this.dataSource.data = data;
+      this.totalElements = data.length;
+      debugger
+    });
   }
 
   onSubmit(): void {
-    if (this.bookForm.valid) {
-      console.log(this.bookForm.value);    }
+    if (this.authorForm.valid) {
+      const author: Author = this.authorForm.value;
+    
+      debugger
+      if (this.isEditMode && this.authorId) {
+        this.authorService.updateAuthor(this.authorId,author).subscribe(() => {
+          this.router.navigate(['/author']);
+        });
+      } else {
+        this.authorService.createAuthor(author).subscribe(() => {
+          this.router.navigate(['/author']);
+        });
+      }
+    }
   }
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
+
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
+  }
+  onPageChange(event: any): void {
+    this.currentPage = event.pageIndex;
+    this.pageSize = event.pageSize;
+    this.loadAuthors();
+  }
+
 }

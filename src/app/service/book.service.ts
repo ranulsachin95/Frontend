@@ -7,20 +7,20 @@ import { Book } from '../model/book';
   providedIn: 'root'
 })
 export class BookService {
-  private url="/api/author"
+  private url="http://localhost:8081/book"
 
   constructor(private httpClient:HttpClient) { }
 
-  getBooks():Observable<Book[]>{
-    return this.httpClient.get<Book[]>(this.url);
+  getAllBooks(page: number, size: number): Observable<Book[]> {
+    return this.httpClient.get<Book[]>(`${this.url}?page=${page}&size=${size}`);
   }
   getBook(id:number):Observable<Book>{
-    return this.httpClient.get<Book>(this.url);
+    return this.httpClient.get<Book>(`${this.url}/${id}`);
   }
   createBook(book:Book):Observable<Book>{
     return this.httpClient.post<Book>(this.url,book);
   }
   updateBook(book:Book,id:number):Observable<Book>{
-    return this.httpClient.post<Book>(this.url,book);
+    return this.httpClient.put<Book>(`${this.url}/${id}`, book);
   }
 }

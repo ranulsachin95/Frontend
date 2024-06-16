@@ -10,12 +10,6 @@ import { AuthorService } from '../../service/author.service';
 import { BookService } from '../../service/book.service';
 
 
-const BOOK_DATA: Book[] = [
-  {id: 1, name: 'Book 1', isbn: '1111', author: {id:1,firstName:"dd",lastName:"s"}},
-  {id: 2, name: 'Book 2', isbn: '2222',  author: {id:1,firstName:"dd",lastName:"s"}},
-  {id: 3, name: 'Book 3', isbn: '3333',  author: {id:1,firstName:"dd",lastName:"s"}},
- 
-];
 @Component({
   selector: 'app-book',
   templateUrl: './book.component.html',
@@ -24,14 +18,14 @@ const BOOK_DATA: Book[] = [
 export class BookComponent implements OnInit{
 
   bookForm: FormGroup;
-  authors = [
-    { id: 1, name: 'Author 1' },
-    { id: 2, name: 'Author 2' },
-    { id: 3, name: 'Author 3' }
-  ];
-  authorss: Author[] = [];
+
+  authors: Author[] = [];
   isEditMode = false;
   bookId: number | null = null;
+  totalElements: number = 0;
+  pageSize: number = 5;
+  currentPage: number = 0;
+  
 
 
   constructor(private fb: FormBuilder, private router: Router,
@@ -51,26 +45,42 @@ export class BookComponent implements OnInit{
   @ViewChild(MatSort) sort!: MatSort ;
   
     displayedColumns: string[] = ['id', 'name', 'isbn', 'author'];
-    dataSource = new MatTableDataSource<Book>(BOOK_DATA);
+    dataSource = new MatTableDataSource<Book>();
   
   
     ngOnInit() {
+      this.loadBooks();
+      this.loadAuthors();
       this.dataSource.paginator = this.paginator;
       this.dataSource.sort = this.sort;
+    }
+    loadAuthors(){
+      this.authorService.getAllAuthors().subscribe(data => {
+       this.authors=data;
+      });
+    }
+
+    loadBooks(): void {
+      this.bookService.getAllBooks(this.currentPage, this.pageSize).subscribe(data => {
+      
+        this.dataSource.data = data;
+        this.totalElements = data.length;
+      });
     }
   
 
     onSubmit(): void {
       if (this.bookForm.valid) {
         const book: Book = this.bookForm.value;
-        // book.author = this.authors.find(author => author.id === +book.author);
+        book.author = this.authors.find(author => author.id === +this.bookForm.get('authorId')?.value);
+        debugger
         if (this.isEditMode && this.bookId) {
           this.bookService.updateBook(book, this.bookId).subscribe(() => {
-            this.router.navigate(['/']);
+            this.router.navigate(['/book']);
           });
         } else {
           this.bookService.createBook(book).subscribe(() => {
-            this.router.navigate(['/']);
+            this.router.navigate(['/book']);
           });
         }
       }
@@ -83,5 +93,10 @@ export class BookComponent implements OnInit{
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
+  }
+  onPageChange(event: any): void {
+    this.currentPage = event.pageIndex;
+    this.pageSize = event.pageSize;
+    this.loadBooks();
   }
 }
