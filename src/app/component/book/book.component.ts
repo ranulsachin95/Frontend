@@ -79,7 +79,6 @@ export class BookComponent implements OnInit {
 
   loadBooks(): void {
     this.bookService.getAllBooks(this.currentPage, this.pageSize).subscribe(data => {
-
       this.dataSource.data = data.content;
       this.totalElements = data.totalElements;
       this.paginator.length = this.totalElements;

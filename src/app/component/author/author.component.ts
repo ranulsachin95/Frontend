@@ -52,7 +52,7 @@ export class AuthorComponent {
       
       this.dataSource.data = data;
       this.totalElements = data.length;
-      debugger
+     
     });
   }
   getAuthor(id:number){
@@ -78,10 +78,10 @@ export class AuthorComponent {
   onSubmit(): void {
     if (this.authorForm.valid) {
       const author: Author = this.authorForm.value;
-    debugger
+
       if (this.isEditMode && this.authorId) {
         this.authorService.updateAuthor(this.authorId,author).subscribe(() => {
-          debugger
+   
           this.showSuccess("SuccessFully  Updated");
         });
       } else {
