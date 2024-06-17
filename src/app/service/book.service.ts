@@ -11,11 +11,11 @@ export class BookService {
 
   constructor(private httpClient:HttpClient) { }
 
-  getAllBooks(page: number, size: number): Observable<Book[]> {
-    return this.httpClient.get<Book[]>(`${this.url}?page=${page}&size=${size}`);
+  getAllBooks(page: number, size: number): Observable<any> {
+    return this.httpClient.get<any>(`${this.url}?page=${page}&size=${size}`);
   }
   getBook(id:number):Observable<Book>{
-    return this.httpClient.get<Book>(`${this.url}/${id}`);
+    return this.httpClient.get<any>(`${this.url}/${id}`);
   }
   createBook(book:Book):Observable<Book>{
     return this.httpClient.post<Book>(this.url,book);
